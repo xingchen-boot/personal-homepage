@@ -26,7 +26,7 @@
           class="article-item"
           @click="goToBlog(blog.id)"
         >
-          <span class="article-date">{{ blog.date }}</span>
+          <span class="article-date">{{ formatDate(blog.date) }}</span>
           <span class="article-title">{{ blog.title }}</span>
         </div>
       </div>
@@ -66,6 +66,11 @@ const filteredBlogs = computed(() => blogList.value)
 
 function goToBlog(id) {
   router.push({ name: 'BlogDetail', params: { id } })
+}
+
+function formatDate(dateStr) {
+  const [year, month, day] = dateStr.split('-')
+  return `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`
 }
 </script>
 
@@ -153,7 +158,8 @@ function goToBlog(id) {
   font-family: 'Fira Code', monospace;
   font-size: 0.8rem;
   color: var(--color-text-muted);
-  min-width: 90px;
+  min-width: 140px;
+  white-space: nowrap;
 }
 
 .article-title {

@@ -39,14 +39,26 @@
           <IconSvg name="home" :size="16" />
           <span>{{ t('nav.home') }}</span>
         </router-link>
-        <router-link to="/archive" class="nav-item" :class="{ active: isActive('/archive') }">
-          <IconSvg name="archive" :size="16" />
-          <span>{{ t('nav.archive') }}</span>
-        </router-link>
-        <router-link to="/tags" class="nav-item" :class="{ active: isActive('/tags') }">
-          <IconSvg name="tag" :size="16" />
-          <span>{{ t('nav.tags') }}</span>
-        </router-link>
+        <div
+          class="nav-dropdown"
+          :class="{ active: isActive('/archive') || isActive('/tags') }"
+        >
+          <div class="nav-item nav-dropdown-trigger">
+            <IconSvg name="document" :size="16" />
+            <span>{{ t('nav.articles') }}</span>
+            <span class="dropdown-arrow">▾</span>
+          </div>
+          <div class="nav-dropdown-menu">
+            <router-link to="/archive" class="dropdown-item" :class="{ active: isActive('/archive') }">
+              <IconSvg name="archive" :size="14" />
+              <span>{{ t('nav.archive') }}</span>
+            </router-link>
+            <router-link to="/tags" class="dropdown-item" :class="{ active: isActive('/tags') }">
+              <IconSvg name="tag" :size="14" />
+              <span>{{ t('nav.tags') }}</span>
+            </router-link>
+          </div>
+        </div>
         <a
           href="https://github.com/xingchen-boot"
           target="_blank"
@@ -67,11 +79,11 @@
         >
           <IconSvg :name="theme === 'light' ? 'moon' : 'sun'" :size="16" />
         </button>
-        <div class="lang-dropdown" @mouseenter="langOpen = true" @mouseleave="langOpen = false">
+        <div class="lang-dropdown">
           <button class="theme-btn lang-btn" :title="'Language'">
             <IconSvg name="globe" :size="16" />
           </button>
-          <div class="lang-menu" v-show="langOpen">
+          <div class="lang-menu">
             <button
               v-for="(name, code) in langNames"
               :key="code"
@@ -89,17 +101,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from '../composables/useI18n'
 import IconSvg from './IconSvg.vue'
 
 const route = useRoute()
-const { theme, isAuto, toggleTheme, setAutoMode } = useTheme()
+const { theme, toggleTheme } = useTheme()
 const { currentLang, t, setLang, langNames } = useI18n()
-
-const langOpen = ref(false)
 
 function isActive(path) {
   if (path === '/') return route.path === '/'
@@ -225,6 +234,83 @@ function isActive(path) {
   transform: scaleX(1);
 }
 
+/* 文章下拉菜单 */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  cursor: pointer;
+}
+
+.dropdown-arrow {
+  font-size: 0.6rem;
+  margin-left: 2px;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 140px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+  /* 用 ::before 填补触发器和菜单之间的间隙 */
+  pointer-events: none;
+}
+
+.nav-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background: var(--color-primary-light);
+  color: var(--color-text);
+}
+
+.dropdown-item.active {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
 /* 主题切换 - 推到右侧 */
 .nav-actions {
   display: flex;
@@ -271,7 +357,6 @@ function isActive(path) {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 4px;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -279,6 +364,27 @@ function isActive(path) {
   min-width: 80px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.lang-menu::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+
+.lang-dropdown:hover .lang-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .lang-option {

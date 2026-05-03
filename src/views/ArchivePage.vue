@@ -57,8 +57,8 @@ function goToBlog(id) {
 }
 
 function formatDate(dateStr) {
-  const [, month, day] = dateStr.split('-')
-  return `${month}月${day}日`
+  const [year, month, day] = dateStr.split('-')
+  return `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`
 }
 </script>
 
@@ -122,7 +122,8 @@ function formatDate(dateStr) {
   font-family: 'Fira Code', monospace;
   font-size: 0.8rem;
   color: var(--color-text-muted);
-  min-width: 70px;
+  min-width: 140px;
+  white-space: nowrap;
 }
 
 .item-title {
