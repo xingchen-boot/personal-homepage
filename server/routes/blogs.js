@@ -2,6 +2,11 @@ const express = require('express')
 const router = express.Router()
 const pool = require('../db')
 
+function addWordCount(blog) {
+  const text = (blog.content || '').replace(/[#*`\-\[\]()!>|\n\r]/g, '').trim()
+  return { ...blog, wordCount: text.length }
+}
+
 // GET /api/blogs - 文章列表（支持 category/tag 筛选）
 router.get('/', async (req, res) => {
   try {
@@ -31,7 +36,7 @@ router.get('/', async (req, res) => {
     sql += ' GROUP BY b.id ORDER BY b.date DESC'
 
     const [rows] = await pool.query(sql, params)
-    const blogs = rows.map(row => ({
+    const blogs = rows.map(row => addWordCount({
       ...row,
       tags: row.tags ? row.tags.split(',') : [],
     }))
@@ -57,10 +62,10 @@ router.get('/:id', async (req, res) => {
     if (blogs.length === 0) {
       return res.status(404).json({ error: '文章不存在' })
     }
-    const blog = {
+    const blog = addWordCount({
       ...blogs[0],
       tags: blogs[0].tags ? blogs[0].tags.split(',') : [],
-    }
+    })
     res.json(blog)
   } catch (err) {
     console.error(err)

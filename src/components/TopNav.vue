@@ -37,56 +37,69 @@
       <nav class="nav-links">
         <router-link to="/" class="nav-item" :class="{ active: isActive('/') }">
           <IconSvg name="home" :size="16" />
-          <span>首页</span>
+          <span>{{ t('nav.home') }}</span>
         </router-link>
         <router-link to="/archive" class="nav-item" :class="{ active: isActive('/archive') }">
           <IconSvg name="archive" :size="16" />
-          <span>归档</span>
+          <span>{{ t('nav.archive') }}</span>
         </router-link>
         <router-link to="/tags" class="nav-item" :class="{ active: isActive('/tags') }">
           <IconSvg name="tag" :size="16" />
-          <span>标签</span>
+          <span>{{ t('nav.tags') }}</span>
         </router-link>
         <a
-          href="https://github.com/your-github"
+          href="https://github.com/xingchen-boot"
           target="_blank"
           rel="noopener noreferrer"
           class="nav-item"
         >
           <IconSvg name="github" :size="16" />
-          <span>GitHub</span>
+          <span>{{ t('nav.github') }}</span>
         </a>
       </nav>
 
-      <!-- 主题切换 -->
+      <!-- 主题切换 + 语言切换 -->
       <div class="nav-actions">
         <button
           class="theme-btn"
           @click="toggleTheme"
-          :title="theme === 'light' ? '切换到夜晚模式' : '切换到白天模式'"
+          :title="theme === 'light' ? t('theme.toDark') : t('theme.toLight')"
         >
           <IconSvg :name="theme === 'light' ? 'moon' : 'sun'" :size="16" />
         </button>
-        <button
-          class="theme-btn auto-btn"
-          :class="{ active: isAuto }"
-          @click="setAutoMode"
-          title="自动切换"
-        >
-          <IconSvg name="clock" :size="14" />
-        </button>
+        <div class="lang-dropdown" @mouseenter="langOpen = true" @mouseleave="langOpen = false">
+          <button class="theme-btn lang-btn" :title="'Language'">
+            <IconSvg name="globe" :size="16" />
+          </button>
+          <div class="lang-menu" v-show="langOpen">
+            <button
+              v-for="(name, code) in langNames"
+              :key="code"
+              class="lang-option"
+              :class="{ active: currentLang === code }"
+              @click="setLang(code)"
+            >
+              {{ name }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
+import { useI18n } from '../composables/useI18n'
 import IconSvg from './IconSvg.vue'
 
 const route = useRoute()
 const { theme, isAuto, toggleTheme, setAutoMode } = useTheme()
+const { currentLang, t, setLang, langNames } = useI18n()
+
+const langOpen = ref(false)
 
 function isActive(path) {
   if (path === '/') return route.path === '/'
@@ -242,6 +255,55 @@ function isActive(path) {
   color: var(--color-primary);
   background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent-light));
   box-shadow: 0 0 8px rgba(91, 141, 239, 0.2);
+}
+
+/* 语言切换下拉 */
+.lang-dropdown {
+  position: relative;
+}
+
+.lang-btn {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.lang-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 80px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 200;
+}
+
+.lang-option {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.lang-option:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.lang-option.active {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {

@@ -1,6 +1,6 @@
 <template>
   <div class="comments">
-    <h4 class="comments-title">最新评论</h4>
+    <h4 class="comments-title">{{ t('blog.comments') }}</h4>
     <div class="comments-list">
       <div v-for="comment in comments" :key="comment.id" class="comment-item">
         <div class="comment-avatar">{{ comment.author[0] }}</div>
@@ -16,19 +16,21 @@
 
     <!-- 评论表单 -->
     <div class="comment-form">
-      <input v-model="author" class="form-input" placeholder="你的名字" />
-      <textarea v-model="content" class="form-textarea" placeholder="写下你的评论..." rows="3"></textarea>
-      <button class="form-btn" @click="submit" :disabled="!author || !content">提交评论</button>
+      <input v-model="author" class="form-input" :placeholder="t('blog.namePlaceholder')" />
+      <textarea v-model="content" class="form-textarea" :placeholder="t('blog.commentPlaceholder')" rows="3"></textarea>
+      <button class="form-btn" @click="submit" :disabled="!author || !content">{{ t('blog.submit') }}</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, inject } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getComments, postComment } from '../api'
+import { useI18n } from '../composables/useI18n'
 
 const route = useRoute()
+const { t } = useI18n()
 const comments = ref([])
 const author = ref('')
 const content = ref('')
@@ -61,13 +63,13 @@ function formatTime(dateStr) {
   const now = new Date()
   const diff = now - d
   const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return '刚刚'
-  if (minutes < 60) return `${minutes}分钟前`
+  if (minutes < 1) return t('blog.justNow')
+  if (minutes < 60) return `${minutes}${t('blog.minutesAgo')}`
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}小时前`
+  if (hours < 24) return `${hours}${t('blog.hoursAgo')}`
   const days = Math.floor(hours / 24)
-  if (days < 30) return `${days}天前`
-  return d.toLocaleDateString('zh-CN')
+  if (days < 30) return `${days}${t('blog.daysAgo')}`
+  return d.toLocaleDateString()
 }
 </script>
 

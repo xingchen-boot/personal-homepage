@@ -4,10 +4,10 @@
     <section class="hero">
       <div class="hero-content">
         <h1 class="hero-title">
-          <span class="title-greeting">Hi, I'm</span>
-          <span class="title-name">星辰!</span>
+          <span class="title-greeting">{{ t('hero.greeting') }}</span>
+          <span class="title-name">{{ t('hero.name') }}</span>
         </h1>
-        <p class="hero-subtitle">Hope my blog can help you ~</p>
+        <p class="hero-subtitle">{{ t('hero.subtitle') }}</p>
       </div>
     </section>
 
@@ -29,17 +29,17 @@
           <div class="stats-section">
             <div class="stat-item">
               <span class="stat-value">{{ blogList.length }}</span>
-              <span class="stat-label">文章</span>
+              <span class="stat-label">{{ t('sidebar.articles') }}</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
               <span class="stat-value">{{ categories.length }}</span>
-              <span class="stat-label">分类</span>
+              <span class="stat-label">{{ t('sidebar.categories') }}</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
               <span class="stat-value">{{ allTags.length }}</span>
-              <span class="stat-label">标签</span>
+              <span class="stat-label">{{ t('sidebar.tagCount') }}</span>
             </div>
           </div>
 
@@ -48,27 +48,27 @@
             <ul class="nav-list">
               <li class="nav-item active">
                 <IconSvg name="home" :size="16" class="nav-icon" />
-                <span class="nav-text">首页</span>
+                <span class="nav-text">{{ t('nav.home') }}</span>
               </li>
               <li class="nav-item">
                 <IconSvg name="document" :size="16" class="nav-icon" />
-                <span class="nav-text">文章</span>
+                <span class="nav-text">{{ t('sidebar.articles') }}</span>
               </li>
               <li class="nav-item">
                 <IconSvg name="user" :size="16" class="nav-icon" />
-                <span class="nav-text">关于</span>
+                <span class="nav-text">{{ t('sidebar.about') }}</span>
               </li>
               <li class="nav-item">
                 <IconSvg name="music" :size="16" class="nav-icon" />
-                <span class="nav-text">歌单</span>
+                <span class="nav-text">{{ t('sidebar.playlist') }}</span>
               </li>
               <li class="nav-item">
                 <IconSvg name="calendar" :size="16" class="nav-icon" />
-                <span class="nav-text">日常</span>
+                <span class="nav-text">{{ t('sidebar.daily') }}</span>
               </li>
               <li class="nav-item dropdown">
                 <IconSvg name="link" :size="16" class="nav-icon" />
-                <span class="nav-text">更多网站</span>
+                <span class="nav-text">{{ t('sidebar.moreSites') }}</span>
                 <span class="dropdown-arrow">▼</span>
               </li>
             </ul>
@@ -79,30 +79,68 @@
       <!-- 最新文章 -->
       <main class="main-content">
         <section class="articles-section">
-          <h2 class="section-title">最新文章</h2>
+          <h2 class="section-title">{{ t('home.latestArticles') }}</h2>
           <div class="article-list">
             <div
-              v-for="blog in blogList"
+              v-for="blog in paginatedBlogs"
               :key="blog.id"
               class="article-card"
               @click="goToBlog(blog.id)"
             >
-              <div class="card-left">
-                <div class="card-date-box">
-                  <span class="date-day">{{ getDay(blog.date) }}</span>
-                  <span class="date-month">{{ getMonthYear(blog.date) }}</span>
-                </div>
+              <div class="card-cover">
+                <img :src="blog.coverImage" :alt="blog.title" />
               </div>
-              <div class="card-right">
+              <div class="card-body">
                 <h3 class="card-title">{{ blog.title }}</h3>
-                <div class="card-meta">
-                  <span class="card-category">{{ blog.category }}</span>
+                <p class="card-desc">{{ getContentPreview(blog.content) }}</p>
+                <div class="card-meta-bottom">
+                  <div class="card-info">
+                    <span class="card-date">
+                      <IconSvg name="calendar" :size="12" />
+                      {{ formatDate(blog.date) }}
+                    </span>
+                    <span class="card-wordcount">
+                      <IconSvg name="document" :size="12" />
+                      {{ blog.wordCount }} {{ t('home.wordCount') }}
+                    </span>
+                    <span class="card-category">{{ blog.category }}</span>
+                  </div>
                   <span class="card-tags">
-                    <span v-for="tag in blog.tags" :key="tag" class="tag">{{ tag }}</span>
+                    <span v-for="tag in blog.tags" :key="tag" class="tag">
+                      <IconSvg name="tag" :size="10" />
+                      {{ tag }}
+                    </span>
                   </span>
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- 分页 -->
+          <div class="pagination" v-if="totalPages > 1">
+            <button
+              class="page-btn"
+              :disabled="currentPage === 1"
+              @click="currentPage--"
+            >
+              &lt;
+            </button>
+            <button
+              v-for="page in totalPages"
+              :key="page"
+              class="page-btn"
+              :class="{ active: currentPage === page }"
+              @click="currentPage = page"
+            >
+              {{ page }}
+            </button>
+            <button
+              class="page-btn"
+              :disabled="currentPage === totalPages"
+              @click="currentPage++"
+            >
+              &gt;
+            </button>
           </div>
         </section>
       </main>
@@ -111,16 +149,47 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBlogs, getCategories, getTags } from '../api'
+import { useI18n } from '../composables/useI18n'
 import avatar from '../assets/20230311003752_5b225.thumb.400_0.jpg'
 import IconSvg from '../components/IconSvg.vue'
+
+const { t } = useI18n()
+
+import articleImg1 from '../assets/article/19f34b7b2763512991d3012c2c2394dd.jpg'
+import articleImg2 from '../assets/article/2c43c242b7dc175852bcaf06c689b97c.jpeg'
+import articleImg3 from '../assets/article/38fc2516d476dabfc9f2a0664198a42d.jpg'
+import articleImg4 from '../assets/article/3f67b6bbe601705401e1ae46970d668f.jpeg'
+import articleImg5 from '../assets/article/5ade2c7b1b39bb37b5ac5cb2b6f52bba.jpeg'
+import articleImg6 from '../assets/article/777e46be6d503e424b77dd379bc6170b.jpg'
+import articleImg7 from '../assets/article/93b870b4f49223a184c8f8d659fcfa82.jpg'
+import articleImg8 from '../assets/article/a7ac25b8e656dc2195a09afc267e9241.jpg'
+import articleImg9 from '../assets/article/c46c2822f2f73129a8e910908b104cdc.jpeg'
+import articleImg10 from '../assets/article/fca17c15ca649527e0a71f95ab7ba3ee.jpeg'
+import articleImg11 from '../assets/article/Doro的三种含义 (1).png'
+
+const coverImages = [
+  articleImg1, articleImg2, articleImg3, articleImg4, articleImg5,
+  articleImg6, articleImg7, articleImg8, articleImg9, articleImg10,
+  articleImg11,
+]
 
 const router = useRouter()
 const blogList = ref([])
 const categories = ref([])
 const allTags = ref([])
+
+const currentPage = ref(1)
+const pageSize = 5
+
+const totalPages = computed(() => Math.ceil(blogList.value.length / pageSize))
+
+const paginatedBlogs = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return blogList.value.slice(start, start + pageSize)
+})
 
 onMounted(async () => {
   const [blogs, cats, tags] = await Promise.all([
@@ -128,22 +197,41 @@ onMounted(async () => {
     getCategories(),
     getTags(),
   ])
-  blogList.value = blogs
+  blogList.value = blogs.map(blog => ({
+    ...blog,
+    coverImage: coverImages[Math.abs(hashCode(blog.id)) % coverImages.length],
+  }))
   categories.value = cats.map(c => c.name)
   allTags.value = tags.map(t => t.name)
 })
+
+function hashCode(str) {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i)
+    hash |= 0
+  }
+  return hash
+}
 
 function goToBlog(id) {
   router.push({ name: 'BlogDetail', params: { id } })
 }
 
-function getDay(dateStr) {
-  return dateStr.split('-')[2]
+function formatDate(dateStr) {
+  const [year, month, day] = dateStr.split('-')
+  return `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`
 }
 
-function getMonthYear(dateStr) {
-  const [year, month] = dateStr.split('-')
-  return `${year}.${month}`
+function getContentPreview(content) {
+  if (!content) return '暂无内容...'
+  const text = content
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/#{1,6}\s+/g, '')
+    .replace(/[*_~`>|\-\[\]()!]/g, '')
+    .replace(/\n+/g, ' ')
+    .trim()
+  return text.length > 120 ? text.slice(0, 120) + '...' : text
 }
 </script>
 
@@ -467,127 +555,112 @@ function getMonthYear(dateStr) {
 
 .article-card {
   display: flex;
-  gap: 20px;
-  padding: 20px;
+  height: 200px;
   background: var(--color-bg-card);
   border-radius: 12px;
   border: 1px solid var(--color-border);
-  cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  position: relative;
   overflow: hidden;
-}
-
-/* 顶部渐变光泽线 */
-.article-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-primary), var(--color-accent), transparent);
-  background-size: 200% auto;
-  opacity: 0;
-  transition: opacity 0.35s ease;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .article-card:hover {
-  border-color: transparent;
-  box-shadow: var(--glow-card);
-  transform: translateY(-6px) scale(1.01);
-  background: linear-gradient(var(--color-bg-card), var(--color-bg-card)) padding-box,
-              linear-gradient(135deg, var(--color-primary), var(--color-accent)) border-box;
-  border: 1px solid transparent;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
 }
 
-.article-card:hover::before {
-  opacity: 1;
-  animation: shimmer 2s linear infinite;
+.article-card:hover .card-cover img {
+  transform: scale(1.06);
 }
 
 .article-card:hover .card-title {
   color: var(--color-primary);
 }
 
-.article-card:hover .card-date-box {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-}
-
-.article-card:hover .date-day {
-  color: #fff;
-}
-
-.article-card:hover .date-month {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* 左侧日期 */
-.card-left {
+/* 左侧封面图 */
+.card-cover {
+  width: 300px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
-.card-date-box {
-  width: 60px;
-  padding: 8px 0;
-  text-align: center;
-  border-radius: 8px;
-  background: var(--color-primary-light);
-  transition: all 0.35s ease;
-}
-
-.date-day {
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  line-height: 1.2;
-  transition: color 0.35s ease;
-}
-
-.date-month {
-  display: block;
-  font-family: 'Fira Code', monospace;
-  font-size: 0.7rem;
-  color: var(--color-text-secondary);
-  margin-top: 2px;
-  transition: color 0.35s ease;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* 右侧内容 */
-.card-right {
+.card-body {
   flex: 1;
   min-width: 0;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card-title {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text);
-  margin-bottom: 8px;
-  line-height: 1.4;
-  transition: color 0.35s ease;
+  margin-bottom: 10px;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.card-meta {
+.card-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 14px;
+  flex: 1;
+}
+
+.card-meta-bottom {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.card-category {
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: var(--color-tag-bg);
-  color: var(--color-tag-text);
-  transition: all 0.3s ease;
+.card-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.article-card:hover .card-category {
-  background: var(--color-primary);
-  color: #fff;
+.card-date,
+.card-wordcount {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.card-category {
+  font-size: 0.72rem;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  white-space: nowrap;
 }
 
 .card-tags {
@@ -597,19 +670,53 @@ function getMonthYear(dateStr) {
 }
 
 .tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 0.7rem;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 10px;
   background: var(--color-bg);
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
-  transition: all 0.3s ease;
 }
 
-.article-card:hover .tag {
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.page-btn:hover:not(:disabled) {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: var(--color-primary-light);
+}
+
+.page-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* 文章卡片入场动画 */
@@ -632,37 +739,6 @@ function getMonthYear(dateStr) {
   }
 }
 
-/* 侧边栏 active 脉冲光晕 */
-@keyframes sidebar-active-glow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(91, 141, 239, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(91, 141, 239, 0.25), 0 0 4px rgba(255, 126, 179, 0.15);
-  }
-}
-
-/* 侧边栏 active 光条呼吸 */
-@keyframes sidebar-bar-pulse {
-  0%, 100% {
-    opacity: 1;
-    width: 3px;
-  }
-  50% {
-    opacity: 0.7;
-    width: 4px;
-  }
-}
-
-/* nav-text 也加入过渡 */
-.nav-text {
-  flex: 1;
-  text-align: left;
-  position: relative;
-  z-index: 1;
-  transition: color 0.3s ease;
-}
-
 @media (max-width: 768px) {
   .hero {
     height: 360px;
@@ -680,22 +756,22 @@ function getMonthYear(dateStr) {
     font-size: 0.9rem;
   }
 
-  /* 移动端隐藏侧边栏 */
   .sidebar {
     display: none;
   }
 
+  .content-wrapper {
+    margin: 24px 16px 40px 16px;
+  }
+
   .article-card {
-    gap: 14px;
-    padding: 16px;
+    flex-direction: column;
   }
 
-  .card-date-box {
-    width: 50px;
-  }
-
-  .date-day {
-    font-size: 1.2rem;
+  .card-cover {
+    width: 100%;
+    height: 180px;
+    border-radius: 12px 12px 0 0;
   }
 }
 </style>

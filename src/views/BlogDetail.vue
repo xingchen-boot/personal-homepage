@@ -23,8 +23,8 @@
   </div>
 
   <div v-else class="not-found">
-    <p>文章不存在</p>
-    <router-link to="/" class="back-link">← 返回首页</router-link>
+    <p>{{ t('blog.notFound') }}</p>
+    <router-link to="/" class="back-link">{{ t('blog.backHome') }}</router-link>
   </div>
 </template>
 
@@ -32,10 +32,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getBlogById } from '../api'
+import { useI18n } from '../composables/useI18n'
 import TableOfContents from '../components/TableOfContents.vue'
 import CommentSection from '../components/CommentSection.vue'
 
 const route = useRoute()
+const { t } = useI18n()
 const blog = ref(null)
 
 onMounted(async () => {

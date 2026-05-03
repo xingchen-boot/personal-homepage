@@ -1,8 +1,8 @@
 <template>
   <div class="archive-page">
     <div class="page-container">
-      <h1 class="page-title">归档</h1>
-      <p class="page-subtitle">共 {{ blogList.length }} 篇文章</p>
+      <h1 class="page-title">{{ t('archive.title') }}</h1>
+      <p class="page-subtitle">{{ blogList.length }} {{ t('archive.totalArticles') }}</p>
 
       <div
         v-for="(blogs, year) in archives"
@@ -31,6 +31,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBlogs } from '../api'
+import { useI18n } from '../composables/useI18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const blogList = ref([])

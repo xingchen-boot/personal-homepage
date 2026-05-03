@@ -1,8 +1,8 @@
 <template>
   <div class="tags-page">
     <div class="page-container">
-      <h1 class="page-title">标签</h1>
-      <p class="page-subtitle">按标签浏览文章</p>
+      <h1 class="page-title">{{ t('tags.title') }}</h1>
+      <p class="page-subtitle">{{ t('tags.subtitle') }}</p>
 
       <!-- 标签云 -->
       <div class="tag-cloud">
@@ -38,6 +38,9 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBlogs, getTags } from '../api'
+import { useI18n } from '../composables/useI18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const selectedTag = ref('')

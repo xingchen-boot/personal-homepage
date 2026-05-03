@@ -256,6 +256,16 @@
       <circle cx="12" cy="20.5" r="0.5" fill="var(--icon-primary)" opacity="0.5" />
       <circle cx="3.5" cy="12" r="0.5" fill="var(--icon-primary)" opacity="0.5" />
     </template>
+
+    <!-- ===== 地球/语言 ===== -->
+    <template v-else-if="name === 'globe'">
+      <circle cx="12" cy="12" r="9.5" stroke="url(#grad-light)" stroke-width="1.6" fill="none" />
+      <ellipse cx="12" cy="12" rx="4" ry="9.5" stroke="var(--icon-grad-end)" stroke-width="1" fill="none" opacity="0.5" />
+      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="var(--icon-grad-end)" stroke-width="1" opacity="0.5" />
+      <line x1="4.5" y1="6.5" x2="19.5" y2="6.5" stroke="var(--icon-grad-end)" stroke-width="0.8" opacity="0.3" />
+      <line x1="4.5" y1="17.5" x2="19.5" y2="17.5" stroke="var(--icon-grad-end)" stroke-width="0.8" opacity="0.3" />
+      <circle cx="12" cy="12" r="1" fill="var(--icon-accent)" opacity="0.5" />
+    </template>
   </svg>
 </template>
 
