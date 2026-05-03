@@ -1,0 +1,90 @@
+/* ========== 白天主题（默认） ========== */
+:root,
+[data-theme="light"] {
+  --color-bg: #faf6ef;
+  --color-bg-secondary: #fffdf8;
+  --color-bg-card: #fffdf8;
+  --color-bg-sidebar: rgba(250, 246, 239, 0.9);
+  --color-bg-code: #2b2b3d;
+
+  --color-text: #2c3e50;
+  --color-text-secondary: #7f8c8d;
+  --color-text-muted: #bdc3c7;
+
+  --color-border: #e8e8e8;
+  --color-border-hover: #d0d0d0;
+
+  --color-primary: #5b8def;
+  --color-primary-light: rgba(91, 141, 239, 0.1);
+  --color-accent: #ff7eb3;
+  --color-accent-light: rgba(255, 126, 179, 0.1);
+
+  --color-tag-bg: rgba(91, 141, 239, 0.08);
+  --color-tag-text: #5b8def;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+
+  --color-scrollbar: #ccc;
+  --color-scrollbar-hover: #aaa;
+
+  /* 发光效果 */
+  --glow-primary: 0 0 15px rgba(91, 141, 239, 0.3), 0 0 30px rgba(91, 141, 239, 0.1);
+  --glow-accent: 0 0 15px rgba(255, 126, 179, 0.3), 0 0 30px rgba(255, 126, 179, 0.1);
+  --glow-card: 0 8px 32px rgba(91, 141, 239, 0.15), 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* 图标配色 */
+  --icon-primary: #5b8def;
+  --icon-accent: #ff7eb3;
+  --icon-grad-start: #5b8def;
+  --icon-grad-end: #a78bfa;
+
+  /* 背景动画 */
+  --bg-animation: cherry-blossom;
+}
+
+/* ========== 夜晚主题 ========== */
+[data-theme="dark"] {
+  --color-bg: #1a1a2e;
+  --color-bg-secondary: #16213e;
+  --color-bg-card: #1f2940;
+  --color-bg-sidebar: rgba(22, 33, 62, 0.9);
+  --color-bg-code: #0d1117;
+
+  --color-text: #e0e0e0;
+  --color-text-secondary: #8892a4;
+  --color-text-muted: #4a5568;
+
+  --color-border: #2d3748;
+  --color-border-hover: #4a5568;
+
+  --color-primary: #64b5f6;
+  --color-primary-light: rgba(100, 181, 246, 0.1);
+  --color-accent: #ff7eb3;
+  --color-accent-light: rgba(255, 126, 179, 0.1);
+
+  --color-tag-bg: rgba(100, 181, 246, 0.1);
+  --color-tag-text: #64b5f6;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
+
+  --color-scrollbar: #4a5568;
+  --color-scrollbar-hover: #718096;
+
+  /* 发光效果（暗色主题更强） */
+  --glow-primary: 0 0 20px rgba(100, 181, 246, 0.4), 0 0 40px rgba(100, 181, 246, 0.15);
+  --glow-accent: 0 0 20px rgba(255, 126, 179, 0.4), 0 0 40px rgba(255, 126, 179, 0.15);
+  --glow-card: 0 8px 32px rgba(100, 181, 246, 0.2), 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  /* 图标配色（夜晚：星空蓝→紫） */
+  --icon-primary: #64b5f6;
+  --icon-accent: #ff7eb3;
+  --icon-grad-start: #64b5f6;
+  --icon-grad-end: #ce93d8;
+
+  /* 背景动画 */
+  --bg-animation: starry;
+}
