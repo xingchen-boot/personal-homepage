@@ -27,6 +27,26 @@ const routes = [
     name: 'Resume',
     component: () => import('../views/ResumePage.vue'),
   },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('../views/AboutPage.vue'),
+  },
+  {
+    path: '/playlist',
+    name: 'Playlist',
+    component: () => import('../views/PlaylistPage.vue'),
+  },
+  {
+    path: '/diary',
+    name: 'Diary',
+    component: () => import('../views/DiaryPage.vue'),
+  },
+  {
+    path: '/links',
+    name: 'Links',
+    component: () => import('../views/LinksPage.vue'),
+  },
 ]
 
 const router = createRouter({

@@ -46,31 +46,39 @@
           <!-- 导航菜单 -->
           <nav class="nav-section">
             <ul class="nav-list">
-              <li class="nav-item active">
+              <router-link to="/" class="nav-item" :class="{ active: isActive('/') }">
                 <IconSvg name="home" :size="16" class="nav-icon" />
                 <span class="nav-text">{{ t('nav.home') }}</span>
-              </li>
-              <li class="nav-item">
+              </router-link>
+              <li class="nav-item nav-dropdown" :class="{ active: isActive('/archive') || isActive('/tags'), open: articleOpen }" @click="articleOpen = !articleOpen">
                 <IconSvg name="document" :size="16" class="nav-icon" />
                 <span class="nav-text">{{ t('sidebar.articles') }}</span>
-              </li>
-              <li class="nav-item">
-                <IconSvg name="user" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.about') }}</span>
-              </li>
-              <li class="nav-item">
-                <IconSvg name="music" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.playlist') }}</span>
-              </li>
-              <li class="nav-item">
-                <IconSvg name="calendar" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.daily') }}</span>
-              </li>
-              <li class="nav-item dropdown">
-                <IconSvg name="link" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.moreSites') }}</span>
                 <span class="dropdown-arrow">▼</span>
               </li>
+              <router-link to="/archive" class="nav-item nav-sub-item" :class="{ active: isActive('/archive') }" v-show="articleOpen">
+                <IconSvg name="archive" :size="16" class="nav-icon" />
+                <span class="nav-text">{{ t('nav.archive') }}</span>
+              </router-link>
+              <router-link to="/tags" class="nav-item nav-sub-item" :class="{ active: isActive('/tags') }" v-show="articleOpen">
+                <IconSvg name="tag" :size="16" class="nav-icon" />
+                <span class="nav-text">{{ t('nav.tags') }}</span>
+              </router-link>
+              <router-link to="/about" class="nav-item" :class="{ active: isActive('/about') }">
+                <IconSvg name="user" :size="16" class="nav-icon" />
+                <span class="nav-text">{{ t('sidebar.about') }}</span>
+              </router-link>
+              <router-link to="/playlist" class="nav-item" :class="{ active: isActive('/playlist') }">
+                <IconSvg name="music" :size="16" class="nav-icon" />
+                <span class="nav-text">{{ t('sidebar.playlist') }}</span>
+              </router-link>
+              <router-link to="/diary" class="nav-item" :class="{ active: isActive('/diary') }">
+                <IconSvg name="calendar" :size="16" class="nav-icon" />
+                <span class="nav-text">{{ t('sidebar.daily') }}</span>
+              </router-link>
+              <router-link to="/links" class="nav-item" :class="{ active: isActive('/links') }">
+                <IconSvg name="link" :size="16" class="nav-icon" />
+                <span class="nav-text">{{ t('sidebar.moreSites') }}</span>
+              </router-link>
             </ul>
           </nav>
         </div>
@@ -150,7 +158,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getBlogs, getCategories, getTags } from '../api'
 import { useI18n } from '../composables/useI18n'
 import avatar from '../assets/20230311003752_5b225.thumb.400_0.jpg'
@@ -177,10 +185,12 @@ const coverImages = [
 ]
 
 const router = useRouter()
+const route = useRoute()
 const blogList = ref([])
 const categories = ref([])
 const allTags = ref([])
 
+const articleOpen = ref(false)
 const currentPage = ref(1)
 const pageSize = 5
 
@@ -212,6 +222,11 @@ function hashCode(str) {
     hash |= 0
   }
   return hash
+}
+
+function isActive(path) {
+  if (path === '/') return route.path === '/'
+  return route.path.startsWith(path)
 }
 
 function goToBlog(id) {
@@ -527,6 +542,18 @@ function getContentPreview(content) {
   font-size: 0.6rem;
   opacity: 0.6;
   transition: all 0.3s ease;
+  margin-left: auto;
+}
+
+/* 侧边栏下拉箭头旋转 */
+.nav-dropdown.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* 子菜单项（归档、标签） */
+.nav-sub-item {
+  padding-left: 28px;
+  font-size: 0.85rem;
 }
 
 /* ========== 主内容区域 ========== */

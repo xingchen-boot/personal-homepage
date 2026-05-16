@@ -68,6 +68,22 @@
           <IconSvg name="github" :size="16" />
           <span>{{ t('nav.github') }}</span>
         </a>
+        <router-link to="/about" class="nav-item" :class="{ active: isActive('/about') }">
+          <IconSvg name="user" :size="16" />
+          <span>{{ t('nav.about') }}</span>
+        </router-link>
+        <router-link to="/playlist" class="nav-item" :class="{ active: isActive('/playlist') }">
+          <IconSvg name="music" :size="16" />
+          <span>{{ t('nav.playlist') }}</span>
+        </router-link>
+        <router-link to="/diary" class="nav-item" :class="{ active: isActive('/diary') }">
+          <IconSvg name="calendar" :size="16" />
+          <span>{{ t('nav.diary') }}</span>
+        </router-link>
+        <router-link to="/links" class="nav-item" :class="{ active: isActive('/links') }">
+          <IconSvg name="link" :size="16" />
+          <span>{{ t('nav.links') }}</span>
+        </router-link>
       </nav>
 
       <!-- 主题切换 + 语言切换 -->

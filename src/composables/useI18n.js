@@ -4,7 +4,7 @@ const currentLang = ref(localStorage.getItem('lang') || 'zh')
 
 const translations = {
   zh: {
-    nav: { home: '首页', articles: '文章', archive: '归档', tags: '标签', github: 'GitHub' },
+    nav: { home: '首页', articles: '文章', archive: '归档', tags: '标签', github: 'GitHub', about: '关于', playlist: '歌单', diary: '日记', links: '友链' },
     hero: { greeting: "Hi, I'm", name: '星辰!', subtitle: 'Hope my blog can help you ~' },
     sidebar: { articles: '文章', categories: '分类', tagCount: '标签', about: '关于', playlist: '歌单', daily: '日常', moreSites: '更多网站' },
     home: { latestArticles: '最新文章', wordCount: '字', prev: '上一页', next: '下一页' },
@@ -14,7 +14,7 @@ const translations = {
     theme: { toDark: '切换到夜晚模式', toLight: '切换到白天模式', auto: '自动切换' },
   },
   en: {
-    nav: { home: 'Home', articles: 'Articles', archive: 'Archive', tags: 'Tags', github: 'GitHub' },
+    nav: { home: 'Home', articles: 'Articles', archive: 'Archive', tags: 'Tags', github: 'GitHub', about: 'About', playlist: 'Playlist', diary: 'Diary', links: 'Links' },
     hero: { greeting: "Hi, I'm", name: 'Xingchen!', subtitle: 'Hope my blog can help you ~' },
     sidebar: { articles: 'Articles', categories: 'Categories', tagCount: 'Tags', about: 'About', playlist: 'Playlist', daily: 'Daily', moreSites: 'More Sites' },
     home: { latestArticles: 'Latest Articles', wordCount: 'words', prev: 'Prev', next: 'Next' },
@@ -24,7 +24,7 @@ const translations = {
     theme: { toDark: 'Switch to dark mode', toLight: 'Switch to light mode', auto: 'Auto switch' },
   },
   ja: {
-    nav: { home: 'ホーム', articles: '記事', archive: 'アーカイブ', tags: 'タグ', github: 'GitHub' },
+    nav: { home: 'ホーム', articles: '記事', archive: 'アーカイブ', tags: 'タグ', github: 'GitHub', about: '自己紹介', playlist: 'プレイリスト', diary: '日記', links: 'リンク' },
     hero: { greeting: 'こんにちは、', name: '星辰です！', subtitle: 'ブログがお役に立てれば幸いです ~' },
     sidebar: { articles: '記事', categories: 'カテゴリ', tagCount: 'タグ', about: '自己紹介', playlist: 'プレイリスト', daily: '日常', moreSites: '他のサイト' },
     home: { latestArticles: '最新記事', wordCount: '字', prev: '前へ', next: '次へ' },
