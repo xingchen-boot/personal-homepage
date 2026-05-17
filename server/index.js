@@ -9,7 +9,12 @@ const commentsRouter = require('./routes/comments')
 const app = express()
 const PORT = process.env.SERVER_PORT || 3001
 
-app.use(cors())
+// CORS 配置 - 允许跨域请求
+app.use(cors({
+  origin: '*',  // 允许所有来源访问
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // 允许的 HTTP 方法
+  allowedHeaders: ['Content-Type', 'Authorization'],  // 允许的请求头
+}))
 app.use(express.json())
 
 // 路由
