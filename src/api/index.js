@@ -1,4 +1,7 @@
-const BASE_URL = '/api'
+// 根据环境变量决定 API 基础地址
+// 开发环境使用 '/api'（通过 vite proxy 代理到本地后端）
+// 生产环境使用 Railway 部署的后端地址
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 async function request(url, options = {}) {
   const res = await fetch(`${BASE_URL}${url}`, {
