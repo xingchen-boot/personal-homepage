@@ -1,6 +1,13 @@
 <template>
   <header class="top-nav">
     <div class="nav-container">
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="mobile-menu-btn" @click="$emit('openDrawer')">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
       <!-- Logo -->
       <router-link to="/" class="nav-logo">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" class="logo-icon">
@@ -88,6 +95,8 @@
 
       <!-- 主题切换 + 语言切换 -->
       <div class="nav-actions">
+        <!-- 搜索框 -->
+        <SearchBox />
         <button
           class="theme-btn"
           @click="toggleTheme"
@@ -121,6 +130,10 @@ import { useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from '../composables/useI18n'
 import IconSvg from './IconSvg.vue'
+import SearchBox from './SearchBox.vue'
+
+// 定义 emits
+defineEmits(['openDrawer'])
 
 const route = useRoute()
 const { theme, toggleTheme } = useTheme()
@@ -428,9 +441,46 @@ function isActive(path) {
   font-weight: 600;
 }
 
+/* 移动端汉堡菜单按钮 */
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.hamburger-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--color-text-secondary);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover .hamburger-line {
+  background: var(--color-primary);
+}
+
 @media (max-width: 768px) {
   .nav-container {
     padding: 0 16px;
+  }
+
+  /* 显示汉堡菜单按钮 */
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  /* 隐藏桌面端导航链接 */
+  .nav-links {
+    display: none;
   }
 
   .nav-item span {

@@ -47,6 +47,12 @@ const routes = [
     name: 'Links',
     component: () => import('../views/LinksPage.vue'),
   },
+  {
+    // 404 页面 - 匹配所有未定义的路由
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../views/NotFoundPage.vue'),
+  },
 ]
 
 const router = createRouter({

@@ -266,6 +266,29 @@
       <line x1="4.5" y1="17.5" x2="19.5" y2="17.5" stroke="var(--icon-grad-end)" stroke-width="0.8" opacity="0.3" />
       <circle cx="12" cy="12" r="1" fill="var(--icon-accent)" opacity="0.5" />
     </template>
+
+    <!-- ===== 搜索 ===== -->
+    <template v-else-if="name === 'search'">
+      <!-- 放大镜圆圈 -->
+      <circle cx="10.5" cy="10.5" r="6.5" stroke="url(#grad-light)" stroke-width="1.6" fill="none" />
+      <!-- 放大镜手柄 -->
+      <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="url(#grad-light)" stroke-width="1.8" stroke-linecap="round" />
+      <!-- 镜片反光 -->
+      <circle cx="8.5" cy="8.5" r="1" fill="var(--icon-accent)" opacity="0.3" />
+    </template>
+
+    <!-- ===== 关闭 ===== -->
+    <template v-else-if="name === 'close'">
+      <!-- X 形状 -->
+      <line x1="6" y1="6" x2="18" y2="18" stroke="url(#grad-light)" stroke-width="1.8" stroke-linecap="round" />
+      <line x1="18" y1="6" x2="6" y2="18" stroke="url(#grad-light)" stroke-width="1.8" stroke-linecap="round" />
+    </template>
+
+    <!-- ===== 上升箭头（回到顶部） ===== -->
+    <template v-else-if="name === 'arrow-up'">
+      <line x1="12" y1="19" x2="12" y2="5" stroke="url(#grad-light)" stroke-width="1.8" stroke-linecap="round" />
+      <polyline points="5,12 12,5 19,12" stroke="url(#grad-light)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    </template>
   </svg>
 </template>
 

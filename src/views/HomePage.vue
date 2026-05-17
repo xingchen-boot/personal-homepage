@@ -96,7 +96,7 @@
               @click="goToBlog(blog.id)"
             >
               <div class="card-cover">
-                <img :src="blog.coverImage" :alt="blog.title" />
+                <img :src="blog.coverImage" :alt="blog.title" loading="lazy" />
               </div>
               <div class="card-body">
                 <h3 class="card-title">{{ blog.title }}</h3>
