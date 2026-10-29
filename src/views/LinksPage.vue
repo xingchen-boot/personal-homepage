@@ -11,22 +11,32 @@
           {{ category.name }}
         </h2>
         <div class="links-grid">
-          <a
+          <component
+            :is="isLocalHostUrl(link.url) ? 'button' : 'a'"
             v-for="link in category.links"
             :key="link.name"
-            :href="link.url"
-            target="_blank"
-            rel="noopener noreferrer"
             class="link-card"
+            :class="{ local: isLocalHostUrl(link.url) }"
+            v-bind="
+              isLocalHostUrl(link.url)
+                ? { type: 'button', title: '仅本机可访问，点击复制地址' }
+                : { href: link.url, target: '_blank', rel: 'noopener noreferrer' }
+            "
+            @click="isLocalHostUrl(link.url) && onLocalClick(link, $event)"
           >
             <div class="link-avatar">
               <img :src="link.avatar" :alt="link.name" />
             </div>
             <div class="link-info">
-              <h3 class="link-name">{{ link.name }}</h3>
+              <h3 class="link-name">
+                {{ link.name }}
+                <span v-if="isLocalHostUrl(link.url)" class="local-badge">
+                  {{ copiedUrl === link.url ? '已复制' : '仅本机' }}
+                </span>
+              </h3>
               <p class="link-desc">{{ link.desc }}</p>
             </div>
-          </a>
+          </component>
         </div>
       </section>
 
@@ -34,7 +44,7 @@
       <section class="apply-section">
         <h2 class="section-title">申请友链</h2>
         <div class="apply-card">
-          <p class="apply-text">如果你也想和我交换友情链接，欢迎通过以下方式联系我：</p>
+          <p class="apply-text">如果你也想和我交换友情链接，欢迎邮件联系：3141163409@qq.com</p>
           <div class="apply-info">
             <div class="info-item">
               <span class="info-label">博客名称：</span>
@@ -42,14 +52,31 @@
             </div>
             <div class="info-item">
               <span class="info-label">博客地址：</span>
-              <span class="info-value">https://your-blog.com</span>
+              <span class="info-value">{{ siteUrl }}</span>
             </div>
             <div class="info-item">
               <span class="info-label">博客描述：</span>
-              <span class="info-value">记录学习与生活</span>
+              <span class="info-value">前端学习、技术实践与生活记录</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">GitHub：</span>
+              <a
+                class="info-value link"
+                href="https://github.com/xingchen-boot"
+                target="_blank"
+                rel="noopener noreferrer"
+              >xingchen-boot</a>
+            </div>
+            <div class="info-item">
+              <span class="info-label">RSS：</span>
+              <a class="info-value link" href="/rss.xml" target="_blank" rel="noopener noreferrer">/rss.xml</a>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Sitemap：</span>
+              <a class="info-value link" href="/sitemap.xml" target="_blank" rel="noopener noreferrer">/sitemap.xml</a>
             </div>
           </div>
-          <p class="apply-note">请在你的博客上先添加我的链接，然后告诉我你的博客信息即可 ~</p>
+          <p class="apply-note">请在你的博客上先添加我的链接，然后把你的博客信息发到邮箱即可 ~</p>
         </div>
       </section>
     </div>
@@ -57,7 +84,72 @@
 </template>
 
 <script setup>
+/**
+ * 友链页：申请信息中的博客地址随当前访问域名自动填充
+ * 本机笔记链点击复制地址，避免访客跳进死链
+ */
+import { ref } from 'vue'
+import { isLocalHostUrl, copyLocalUrl } from '../utils/localLink'
+
+const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://github.com/xingchen-boot'
+const copiedUrl = ref('')
+
+/** 本地源码精读站（Astro，需本机 4321 在跑） */
+const NOTES_BASE = 'http://127.0.0.1:4321'
+
+async function onLocalClick(link, event) {
+  event?.preventDefault?.()
+  const ok = await copyLocalUrl(link.url)
+  if (!ok) return
+  copiedUrl.value = link.url
+  window.setTimeout(() => {
+    if (copiedUrl.value === link.url) copiedUrl.value = ''
+  }, 1800)
+}
+
 const linkCategories = [
+  {
+    name: '我的源码精读',
+    icon: '📖',
+    links: [
+      {
+        name: 'Pi Agent 阅读指南',
+        desc: '星辰笔记：Pi 源码精读 + 实战上手（仅本机 4321，点击复制地址）',
+        url: `${NOTES_BASE}/mine/`,
+        avatar: '/blog/link-pi.svg',
+      },
+      {
+        name: 'dsh 源码精读',
+        desc: '星辰笔记：DeepSeek Harness（仅本机 4321，点击复制地址）',
+        url: `${NOTES_BASE}/modules/dsh-ch01`,
+        avatar: '/blog/link-dsh.svg',
+      },
+      {
+        name: '精读站首页',
+        desc: '双轨目录（仅本机 4321，点击复制地址）',
+        url: `${NOTES_BASE}/`,
+        avatar: '/blog/link-notes.svg',
+      },
+      {
+        name: 'earendil-works/pi',
+        desc: 'Pi Agent 上游仓库',
+        url: 'https://github.com/earendil-works/pi',
+        avatar: 'https://picsum.photos/seed/pi-upstream/80/80',
+      },
+      {
+        name: 'deepseek-ai/deepseek-harness',
+        desc: 'DeepSeek Harness（dsh）上游仓库',
+        url: 'https://github.com/deepseek-ai/deepseek-harness',
+        avatar: 'https://picsum.photos/seed/dsh-upstream/80/80',
+      },
+      {
+        name: 'dsh 官方文档',
+        desc: 'DeepSeek Harness 官方 VitePress 文档',
+        url: 'https://deepseek-harness.github.io/deepseek-harness/',
+        avatar: 'https://picsum.photos/seed/dsh-docs/80/80',
+      },
+    ],
+  },
   {
     name: '技术博客',
     icon: '📝',
@@ -161,13 +253,38 @@ const linkCategories = [
   border-radius: 12px;
   border: 1px solid var(--color-border);
   text-decoration: none;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  width: 100%;
+  cursor: pointer;
   transition: all 0.3s ease;
+}
+
+button.link-card {
+  appearance: none;
 }
 
 .link-card:hover {
   border-color: var(--color-primary);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(91, 141, 239, 0.1);
+}
+
+.link-card.local {
+  border-style: dashed;
+}
+
+.local-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  vertical-align: middle;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .link-avatar {
@@ -253,6 +370,15 @@ const linkCategories = [
 .info-value {
   color: var(--color-text);
   font-weight: 500;
+}
+
+.info-value.link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.info-value.link:hover {
+  text-decoration: underline;
 }
 
 .apply-note {

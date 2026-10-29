@@ -1,8 +1,8 @@
 <template>
   <div class="layout">
-    <!-- 背景动画 -->
+    <!-- 背景动画：亮色樱花；暗色 WebGL 星空（可降级 2D） -->
     <CherryBlossomBg v-if="theme === 'light'" />
-    <StarryBackground v-else />
+    <DarkSkyBackground v-else />
 
     <!-- 顶部导航 -->
     <TopNav @open-drawer="drawerOpen = true" />
@@ -13,17 +13,19 @@
     <!-- 阅读进度条 -->
     <ReadingProgress />
 
-    <!-- 主内容区 -->
+    <!-- API 离线提示 -->
+    <OfflineBanner />
+
+    <!-- 主内容区：不用 transition（多根/加载态换根时 fade-enter-from 会卡住 → 整页 opacity:0 空白） -->
     <main class="main-content">
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <router-view />
     </main>
 
     <!-- 回到顶部按钮 -->
     <BackToTop />
+
+    <!-- 本地问答助手（无 API Key） -->
+    <LocalAgentChat />
   </div>
 </template>
 
@@ -32,10 +34,12 @@ import { ref } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import TopNav from '../components/TopNav.vue'
 import CherryBlossomBg from '../components/CherryBlossomBg.vue'
-import StarryBackground from '../components/StarryBackground.vue'
+import DarkSkyBackground from '../components/DarkSkyBackground.vue'
 import ReadingProgress from '../components/ReadingProgress.vue'
 import BackToTop from '../components/BackToTop.vue'
 import MobileDrawer from '../components/MobileDrawer.vue'
+import OfflineBanner from '../components/OfflineBanner.vue'
+import LocalAgentChat from '../components/LocalAgentChat.vue'
 
 const { theme } = useTheme()
 const drawerOpen = ref(false)

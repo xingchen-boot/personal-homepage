@@ -19,7 +19,7 @@
             <img :src="avatar" alt="Avatar" />
           </div>
           <h3 class="drawer-name">星辰</h3>
-          <p class="drawer-desc">You and Me</p>
+          <p class="drawer-desc">前端开发 · 腾讯实习</p>
         </div>
 
         <!-- 导航菜单 -->
@@ -59,6 +59,8 @@ const menuItems = [
   { path: '/archive', icon: 'archive', label: '归档' },
   { path: '/tags', icon: 'tag', label: '标签' },
   { path: '/about', icon: 'user', label: '关于' },
+  { path: '/resume', icon: 'document', label: '简历' },
+  { path: '/projects', icon: 'archive', label: '项目' },
   { path: '/playlist', icon: 'music', label: '歌单' },
   { path: '/diary', icon: 'calendar', label: '日记' },
   { path: '/links', icon: 'link', label: '友链' },

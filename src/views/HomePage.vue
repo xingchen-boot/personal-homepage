@@ -1,13 +1,20 @@
 <template>
   <div class="home-page">
-    <!-- Hero 区域 -->
+    <!-- Hero：定位一句 + 证据 + CTA（求职访客 10 秒叙事） -->
     <section class="hero">
       <div class="hero-content">
+        <p class="hero-status">{{ t('hero.status') }}</p>
         <h1 class="hero-title">
           <span class="title-greeting">{{ t('hero.greeting') }}</span>
           <span class="title-name">{{ t('hero.name') }}</span>
         </h1>
         <p class="hero-subtitle">{{ t('hero.subtitle') }}</p>
+        <p class="hero-evidence">{{ t('hero.evidence') }}</p>
+        <div class="hero-actions">
+          <router-link to="/resume" class="hero-btn">{{ t('hero.ctaResume') }}</router-link>
+          <a :href="CONTACT_EMAIL" class="hero-btn ghost">{{ t('hero.ctaEmail') }}</a>
+          <a href="#featured-projects" class="hero-btn ghost">{{ t('hero.ctaProjects') }}</a>
+        </div>
       </div>
     </section>
 
@@ -22,10 +29,10 @@
               <img :src="avatar" alt="Avatar" />
             </div>
             <h3 class="profile-name">星辰</h3>
-            <p class="profile-desc">You and Me</p>
+            <p class="profile-desc">{{ t('hero.status') }}</p>
           </div>
 
-          <!-- 统计数据 -->
+          <!-- 统计：次要信息，不抢叙事 -->
           <div class="stats-section">
             <div class="stat-item">
               <span class="stat-value">{{ blogList.length }}</span>
@@ -43,64 +50,165 @@
             </div>
           </div>
 
-          <!-- 导航菜单 -->
-          <nav class="nav-section">
-            <ul class="nav-list">
-              <router-link to="/" class="nav-item" :class="{ active: isActive('/') }">
-                <IconSvg name="home" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('nav.home') }}</span>
-              </router-link>
-              <li class="nav-item nav-dropdown" :class="{ active: isActive('/archive') || isActive('/tags'), open: articleOpen }" @click="articleOpen = !articleOpen">
-                <IconSvg name="document" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.articles') }}</span>
-                <span class="dropdown-arrow">▼</span>
-              </li>
-              <router-link to="/archive" class="nav-item nav-sub-item" :class="{ active: isActive('/archive') }" v-show="articleOpen">
-                <IconSvg name="archive" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('nav.archive') }}</span>
-              </router-link>
-              <router-link to="/tags" class="nav-item nav-sub-item" :class="{ active: isActive('/tags') }" v-show="articleOpen">
-                <IconSvg name="tag" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('nav.tags') }}</span>
-              </router-link>
-              <router-link to="/about" class="nav-item" :class="{ active: isActive('/about') }">
-                <IconSvg name="user" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.about') }}</span>
-              </router-link>
-              <router-link to="/playlist" class="nav-item" :class="{ active: isActive('/playlist') }">
-                <IconSvg name="music" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.playlist') }}</span>
-              </router-link>
-              <router-link to="/diary" class="nav-item" :class="{ active: isActive('/diary') }">
-                <IconSvg name="calendar" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.daily') }}</span>
-              </router-link>
-              <router-link to="/links" class="nav-item" :class="{ active: isActive('/links') }">
-                <IconSvg name="link" :size="16" class="nav-icon" />
-                <span class="nav-text">{{ t('sidebar.moreSites') }}</span>
-              </router-link>
-            </ul>
-          </nav>
+          <!-- 触达：简历 / GitHub / 邮件 -->
+          <div class="quick-section">
+            <h4 class="hot-title">{{ t('sidebar.quickLinks') }}</h4>
+            <router-link to="/resume" class="quick-link">
+              <IconSvg name="document" :size="14" />
+              <span>{{ t('sidebar.resume') }}</span>
+            </router-link>
+            <router-link to="/projects" class="quick-link">
+              <IconSvg name="archive" :size="14" />
+              <span>{{ t('sidebar.projects') }}</span>
+            </router-link>
+            <a
+              href="https://github.com/xingchen-boot"
+              class="quick-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconSvg name="github" :size="14" />
+              <span>{{ t('sidebar.github') }}</span>
+            </a>
+            <a :href="CONTACT_EMAIL" class="quick-link">
+              <IconSvg name="mail" :size="14" />
+              <span>{{ t('sidebar.email') }}</span>
+            </a>
+          </div>
+
+          <!-- 热门文章 -->
+          <div v-if="popularBlogs.length" class="hot-section">
+            <h4 class="hot-title">{{ t('sidebar.hot') }}</h4>
+            <router-link
+              v-for="(item, index) in popularBlogs"
+              :key="item.id"
+              :to="{ name: 'BlogDetail', params: { id: item.id } }"
+              class="hot-item"
+            >
+              <span class="hot-rank">{{ index + 1 }}</span>
+              <span class="hot-name">{{ item.title }}</span>
+            </router-link>
+          </div>
         </div>
       </aside>
 
       <!-- 最新文章 -->
       <main class="main-content">
+        <!-- 精选项目：问题 → 结果 → 复盘/外链 -->
+        <section
+          id="featured-projects"
+          class="projects-preview"
+          aria-labelledby="projects-preview-title"
+        >
+          <div class="preview-header">
+            <h2 id="projects-preview-title" class="section-title">{{ t('home.featuredProjects') }}</h2>
+            <router-link to="/projects" class="preview-more">{{ t('home.viewAllProjects') }} →</router-link>
+          </div>
+          <div class="preview-grid">
+            <article v-for="project in featuredProjects" :key="project.id" class="preview-card">
+              <div class="preview-card-top">
+                <h3 class="preview-name">{{ project.name }}</h3>
+                <span v-if="project.metric" class="preview-metric">{{ project.metric }}</span>
+              </div>
+              <dl class="preview-case" v-if="project.problem || project.result">
+                <div v-if="project.problem" class="case-row">
+                  <dt>{{ t('home.problem') }}</dt>
+                  <dd>{{ project.problem }}</dd>
+                </div>
+                <div v-if="project.result" class="case-row">
+                  <dt>{{ t('home.result') }}</dt>
+                  <dd>{{ project.result }}</dd>
+                </div>
+              </dl>
+              <p v-else class="preview-summary">{{ project.summary }}</p>
+              <div class="preview-tags">
+                <span v-for="tag in project.tags.slice(0, 4)" :key="tag" class="preview-tag">{{ tag }}</span>
+              </div>
+              <div class="preview-actions">
+                <router-link
+                  v-if="project.writeupId"
+                  :to="{ name: 'BlogDetail', params: { id: project.writeupId } }"
+                  class="preview-action"
+                >
+                  {{ t('home.readWriteup') }} →
+                </router-link>
+                <LocalNoteLink
+                  v-if="project.link && isLocalOnlyLink(project)"
+                  :url="project.link"
+                  :label="project.linkLabel || t('home.localNote')"
+                  ghost
+                />
+                <a
+                  v-else-if="project.link"
+                  :href="project.link"
+                  class="preview-action ghost"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ project.linkLabel || t('home.visitProject') }} →
+                </a>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- 代表作深文：写作证明能力 -->
+        <section
+          v-if="featuredWriteups.length"
+          class="writeups-section"
+          aria-labelledby="writeups-title"
+        >
+          <div class="preview-header">
+            <h2 id="writeups-title" class="section-title">{{ t('home.featuredWriteups') }}</h2>
+            <router-link to="/archive" class="preview-more">{{ t('home.viewAllArticles') }} →</router-link>
+          </div>
+          <div class="writeup-list">
+            <router-link
+              v-for="post in featuredWriteups"
+              :key="post.id"
+              :to="{ name: 'BlogDetail', params: { id: post.id } }"
+              class="writeup-card"
+            >
+              <span class="writeup-category">{{ post.category }}</span>
+              <h3 class="writeup-title">{{ post.title }}</h3>
+              <p class="writeup-summary">{{ post.summary }}</p>
+              <span class="writeup-meta">{{ formatDate(post.date) }}</span>
+            </router-link>
+          </div>
+        </section>
+
         <section class="articles-section">
           <h2 class="section-title">{{ t('home.latestArticles') }}</h2>
-          <div class="article-list">
-            <div
+
+          <!-- 加载中：骨架屏 -->
+          <div v-if="loading" class="skeleton-list" aria-busy="true" aria-label="文章加载中">
+            <SkeletonLoader v-for="n in 3" :key="n" type="article-card" />
+          </div>
+
+          <!-- 空状态：无文章时引导去项目 / 简历 -->
+          <div v-else-if="blogList.length === 0" class="empty-state">
+            <p class="empty-title">{{ t('home.emptyTitle') }}</p>
+            <p class="empty-desc">{{ t('home.emptyDesc') }}</p>
+            <div class="empty-actions">
+              <router-link to="/projects" class="empty-btn">{{ t('home.emptyProjects') }}</router-link>
+              <router-link to="/resume" class="empty-btn ghost">{{ t('home.emptyResume') }}</router-link>
+            </div>
+          </div>
+
+          <div v-else class="article-list">
+            <!-- 使用 router-link：可右键新开、可键盘 Tab 聚焦，利于 SEO -->
+            <router-link
               v-for="blog in paginatedBlogs"
               :key="blog.id"
+              :to="{ name: 'BlogDetail', params: { id: blog.id } }"
               class="article-card"
-              @click="goToBlog(blog.id)"
             >
               <div class="card-cover">
                 <img :src="blog.coverImage" :alt="blog.title" loading="lazy" />
               </div>
               <div class="card-body">
                 <h3 class="card-title">{{ blog.title }}</h3>
-                <p class="card-desc">{{ getContentPreview(blog.content) }}</p>
+                <p class="card-desc">{{ blog.summary || getContentPreview(blog.content) }}</p>
                 <div class="card-meta-bottom">
                   <div class="card-info">
                     <span class="card-date">
@@ -114,14 +222,14 @@
                     <span class="card-category">{{ blog.category }}</span>
                   </div>
                   <span class="card-tags">
-                    <span v-for="tag in blog.tags" :key="tag" class="tag">
+                    <span v-for="tag in displayTags(blog)" :key="tag" class="tag">
                       <IconSvg name="tag" :size="10" />
                       {{ tag }}
                     </span>
                   </span>
                 </div>
               </div>
-            </div>
+            </router-link>
           </div>
 
           <!-- 分页 -->
@@ -157,14 +265,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { getBlogs, getCategories, getTags } from '../api'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { getBlogs, getCategories, getTags, getPopularBlogs } from '../api'
+import { formatDate } from '../utils/date'
 import { useI18n } from '../composables/useI18n'
+import { projectList } from '../data/projects'
+import { resumeArticles } from '../data/resumeArticles'
+import { isLocalOnlyLink } from '../utils/localLink'
 import avatar from '../assets/20230311003752_5b225.thumb.400_0.jpg'
 import IconSvg from '../components/IconSvg.vue'
+import LocalNoteLink from '../components/LocalNoteLink.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
 
 const { t } = useI18n()
+
+/** 公开联系邮箱（与简历页一致） */
+const CONTACT_EMAIL = 'mailto:3141163409@qq.com'
+
+/** 首页代表作深文顺序 */
+const WRITEUP_IDS = ['css-runtime-sinking', 'frontcode-ai-agent', 'virtual-list-streaming']
 
 import articleImg1 from '../assets/article/19f34b7b2763512991d3012c2c2394dd.jpg'
 import articleImg2 from '../assets/article/2c43c242b7dc175852bcaf06c689b97c.jpeg'
@@ -184,35 +303,79 @@ const coverImages = [
   articleImg11,
 ]
 
-const router = useRouter()
-const route = useRoute()
 const blogList = ref([])
 const categories = ref([])
 const allTags = ref([])
+const popularBlogs = ref([])
 
-const articleOpen = ref(false)
+/** 首页展示前 3 个代表性项目（腾讯专项 + FrontCode + 问卷易） */
+const featuredProjects = computed(() => {
+  const preferredIds = ['tencent-css', 'frontcode', 'wenjuanyi']
+  const picked = preferredIds
+    .map((id) => projectList.find((item) => item.id === id))
+    .filter(Boolean)
+  return picked.length ? picked : projectList.slice(0, 3)
+})
+
+/** 代表作深文：优先 API 列表，缺省用本地 resumeArticles */
+const featuredWriteups = computed(() => {
+  return WRITEUP_IDS.map((id) => {
+    const fromApi = blogList.value.find((b) => String(b.id) === id)
+    if (fromApi) return fromApi
+    return resumeArticles.find((b) => b.id === id)
+  }).filter(Boolean)
+})
+
 const currentPage = ref(1)
 const pageSize = 5
+/** 首屏数据是否仍在加载 */
+const loading = ref(true)
 
-const totalPages = computed(() => Math.ceil(blogList.value.length / pageSize))
+/** 最新列表去掉代表作深文，避免与上方区块重复 */
+const feedBlogs = computed(() =>
+  blogList.value.filter((b) => !WRITEUP_IDS.includes(String(b.id))),
+)
+
+const totalPages = computed(() => Math.ceil(feedBlogs.value.length / pageSize))
 
 const paginatedBlogs = computed(() => {
   const start = (currentPage.value - 1) * pageSize
-  return blogList.value.slice(start, start + pageSize)
+  return feedBlogs.value.slice(start, start + pageSize)
+})
+
+/** 标签与分类同名时去重，卡片上最多展示 4 个 */
+function displayTags(blog) {
+  return (blog?.tags || []).filter((tag) => tag && tag !== blog.category).slice(0, 4)
+}
+
+watch(currentPage, () => {
+  nextTick(() => {
+    document.querySelector('.articles-section')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  })
 })
 
 onMounted(async () => {
-  const [blogs, cats, tags] = await Promise.all([
-    getBlogs(),
-    getCategories(),
-    getTags(),
-  ])
-  blogList.value = blogs.map(blog => ({
-    ...blog,
-    coverImage: coverImages[Math.abs(hashCode(blog.id)) % coverImages.length],
-  }))
-  categories.value = cats.map(c => c.name)
-  allTags.value = tags.map(t => t.name)
+  loading.value = true
+  try {
+    const [blogs, cats, tags, popular] = await Promise.all([
+      getBlogs(),
+      getCategories(),
+      getTags(),
+      getPopularBlogs(5),
+    ])
+    blogList.value = blogs.map(blog => ({
+      ...blog,
+      coverImage: coverImages[Math.abs(hashCode(String(blog.id))) % coverImages.length],
+    }))
+    categories.value = cats.map(c => c.name)
+    allTags.value = tags.map(t => t.name)
+    popularBlogs.value = popular
+  } finally {
+    loading.value = false
+  }
 })
 
 function hashCode(str) {
@@ -224,27 +387,19 @@ function hashCode(str) {
   return hash
 }
 
-function isActive(path) {
-  if (path === '/') return route.path === '/'
-  return route.path.startsWith(path)
-}
-
-function goToBlog(id) {
-  router.push({ name: 'BlogDetail', params: { id } })
-}
-
-function formatDate(dateStr) {
-  const [year, month, day] = dateStr.split('-')
-  return `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`
-}
-
 function getContentPreview(content) {
   if (!content) return '暂无内容...'
   const text = content
     .replace(/```[\s\S]*?```/g, '')
-    .replace(/#{1,6}\s+/g, '')
-    .replace(/[*_~`>|\-\[\]()!]/g, '')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/^>\s?/gm, '')
+    .replace(/^[-*]\s+/gm, '')
+    .replace(/\|/g, ' ')
+    .replace(/[*_~`]/g, '')
     .replace(/\n+/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim()
   return text.length > 120 ? text.slice(0, 120) + '...' : text
 }
@@ -260,9 +415,9 @@ function getContentPreview(content) {
   position: relative;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  height: 520px;
+  min-height: 520px;
   margin-top: -56px;
-  padding-top: 56px;
+  padding: 72px 24px 48px;
   overflow: hidden;
   background: transparent;
   display: flex;
@@ -273,6 +428,19 @@ function getContentPreview(content) {
 .hero-content {
   text-align: center;
   color: var(--color-text);
+  max-width: 720px;
+}
+
+.hero-status {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 28%, transparent);
+  border-radius: 999px;
 }
 
 .hero-title {
@@ -301,9 +469,59 @@ function getContentPreview(content) {
 }
 
 .hero-subtitle {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
   color: var(--color-text-secondary);
-  animation: float 3s ease-in-out infinite;
+  margin: 0 auto 12px;
+  max-width: 36em;
+}
+
+.hero-evidence {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  opacity: 0.85;
+  margin: 0 auto 22px;
+  max-width: 40em;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.hero-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.hero-btn.ghost {
+  color: var(--color-text);
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+}
+
+.hero-btn.ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* ========== 内容区域布局 ========== */
@@ -376,8 +594,33 @@ function getContentPreview(content) {
 }
 
 .profile-desc {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.quick-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
   font-size: 0.85rem;
   color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.quick-link:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
 }
 
 /* 统计数据 */
@@ -430,6 +673,55 @@ function getContentPreview(content) {
 }
 
 /* 导航菜单 */
+.hot-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.hot-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+
+.hot-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.hot-item:hover {
+  color: var(--color-primary);
+}
+
+.hot-rank {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.hot-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .nav-section {
   margin-top: 8px;
 }
@@ -567,6 +859,12 @@ function getContentPreview(content) {
   width: 100%;
 }
 
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .section-title {
   font-size: 1.2rem;
   font-weight: 700;
@@ -589,12 +887,235 @@ function getContentPreview(content) {
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .article-card:hover {
   border-color: var(--color-primary);
   box-shadow: var(--shadow-md);
   transform: translateY(-3px);
+}
+
+/* 项目预览区 */
+.projects-preview {
+  margin-bottom: 36px;
+  scroll-margin-top: 72px;
+}
+
+.preview-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-header .section-title {
+  margin-bottom: 16px;
+}
+
+.preview-more {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  margin-bottom: 16px;
+}
+
+.preview-more:hover {
+  text-decoration: underline;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.preview-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.preview-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.preview-card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.preview-name {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.preview-metric {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.preview-summary {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.preview-case {
+  margin: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.case-row dt {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 2px;
+}
+
+.case-row dd {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.preview-tag {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.preview-action {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.preview-action:hover {
+  text-decoration: underline;
+}
+
+.preview-action.ghost {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.writeups-section {
+  margin-bottom: 36px;
+}
+
+.writeup-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.writeup-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.writeup-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.writeup-category {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+}
+
+.writeup-title {
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--color-text);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.writeup-summary {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.writeup-meta {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  opacity: 0.85;
 }
 
 .article-card:hover .card-cover img {
@@ -708,6 +1229,52 @@ function getContentPreview(content) {
   border: 1px solid var(--color-border);
 }
 
+/* 空状态 */
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--color-bg-card);
+  border: 1px dashed var(--color-border);
+  border-radius: 14px;
+}
+
+.empty-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.empty-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.empty-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.empty-btn {
+  display: inline-flex;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.empty-btn.ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
 /* 分页 */
 .pagination {
   display: flex;
@@ -766,9 +1333,17 @@ function getContentPreview(content) {
   }
 }
 
+@media (max-width: 1100px) {
+  .preview-grid,
+  .writeup-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .hero {
-    height: 360px;
+    min-height: 0;
+    padding: 64px 16px 36px;
   }
 
   .title-greeting {
@@ -781,6 +1356,10 @@ function getContentPreview(content) {
 
   .hero-subtitle {
     font-size: 0.9rem;
+  }
+
+  .hero-evidence {
+    font-size: 0.75rem;
   }
 
   .sidebar {

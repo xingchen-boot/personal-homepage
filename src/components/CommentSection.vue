@@ -17,8 +17,21 @@
     <!-- 评论表单 -->
     <div class="comment-form">
       <input v-model="author" class="form-input" :placeholder="t('blog.namePlaceholder')" />
+      <!-- 蜜罐字段：对真人隐藏，机器人常会自动填写 -->
+      <input
+        v-model="website"
+        class="honeypot"
+        type="text"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+      />
       <textarea v-model="content" class="form-textarea" :placeholder="t('blog.commentPlaceholder')" rows="3"></textarea>
-      <button class="form-btn" @click="submit" :disabled="!author || !content">{{ t('blog.submit') }}</button>
+      <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
+      <button class="form-btn" @click="submit" :disabled="!author || !content || submitting">
+        {{ submitting ? '提交中...' : t('blog.submit') }}
+      </button>
     </div>
   </div>
 </template>
@@ -34,6 +47,10 @@ const { t } = useI18n()
 const comments = ref([])
 const author = ref('')
 const content = ref('')
+/** 蜜罐：应始终为空 */
+const website = ref('')
+const submitting = ref(false)
+const errorMessage = ref('')
 
 async function loadComments() {
   try {
@@ -46,14 +63,23 @@ async function loadComments() {
 onMounted(loadComments)
 
 async function submit() {
-  if (!author.value || !content.value) return
+  if (!author.value || !content.value || submitting.value) return
+  submitting.value = true
+  errorMessage.value = ''
   try {
-    await postComment(route.params.id, { author: author.value, content: content.value })
+    await postComment(route.params.id, {
+      author: author.value,
+      content: content.value,
+      website: website.value,
+    })
     author.value = ''
     content.value = ''
+    website.value = ''
     await loadComments()
   } catch (err) {
-    alert(err.message)
+    errorMessage.value = err.message || '提交失败'
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -189,5 +215,20 @@ function formatTime(dateStr) {
 
 .form-btn:not(:disabled):hover {
   opacity: 0.85;
+}
+
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.form-error {
+  font-size: 0.8rem;
+  color: #e05c5c;
 }
 </style>

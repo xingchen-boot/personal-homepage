@@ -79,30 +79,74 @@
           <IconSvg name="user" :size="16" />
           <span>{{ t('nav.about') }}</span>
         </router-link>
-        <router-link to="/playlist" class="nav-item" :class="{ active: isActive('/playlist') }">
-          <IconSvg name="music" :size="16" />
-          <span>{{ t('nav.playlist') }}</span>
+        <router-link to="/resume" class="nav-item" :class="{ active: isActive('/resume') }">
+          <IconSvg name="document" :size="16" />
+          <span>{{ t('nav.resume') }}</span>
         </router-link>
-        <router-link to="/diary" class="nav-item" :class="{ active: isActive('/diary') }">
-          <IconSvg name="calendar" :size="16" />
-          <span>{{ t('nav.diary') }}</span>
+        <router-link to="/projects" class="nav-item" :class="{ active: isActive('/projects') }">
+          <IconSvg name="archive" :size="16" />
+          <span>{{ t('nav.projects') }}</span>
         </router-link>
-        <router-link to="/links" class="nav-item" :class="{ active: isActive('/links') }">
-          <IconSvg name="link" :size="16" />
-          <span>{{ t('nav.links') }}</span>
-        </router-link>
+        <!-- 次要入口收入「更多」：邮件降级，避免顶栏过挤 -->
+        <div
+          class="nav-dropdown"
+          :class="{ active: isActive('/playlist') || isActive('/diary') || isActive('/links') }"
+        >
+          <div class="nav-item nav-dropdown-trigger">
+            <IconSvg name="link" :size="16" />
+            <span>{{ t('nav.more') }}</span>
+            <span class="dropdown-arrow">▾</span>
+          </div>
+          <div class="nav-dropdown-menu">
+            <a href="mailto:3141163409@qq.com" class="dropdown-item">
+              <IconSvg name="mail" :size="14" />
+              <span>{{ t('hero.ctaEmail') }}</span>
+            </a>
+            <router-link to="/playlist" class="dropdown-item" :class="{ active: isActive('/playlist') }">
+              <IconSvg name="music" :size="14" />
+              <span>{{ t('nav.playlist') }}</span>
+            </router-link>
+            <router-link to="/diary" class="dropdown-item" :class="{ active: isActive('/diary') }">
+              <IconSvg name="calendar" :size="14" />
+              <span>{{ t('nav.diary') }}</span>
+            </router-link>
+            <router-link to="/links" class="dropdown-item" :class="{ active: isActive('/links') }">
+              <IconSvg name="link" :size="14" />
+              <span>{{ t('nav.links') }}</span>
+            </router-link>
+          </div>
+        </div>
       </nav>
 
       <!-- 主题切换 + 语言切换 -->
       <div class="nav-actions">
         <!-- 搜索框 -->
         <SearchBox />
+        <a
+          href="mailto:3141163409@qq.com"
+          class="theme-btn mail-btn"
+          :title="t('hero.ctaEmail')"
+          :aria-label="t('hero.ctaEmail')"
+        >
+          <IconSvg name="mail" :size="16" />
+        </a>
         <button
           class="theme-btn"
           @click="toggleTheme"
           :title="theme === 'light' ? t('theme.toDark') : t('theme.toLight')"
         >
           <IconSvg :name="theme === 'light' ? 'moon' : 'sun'" :size="16" />
+        </button>
+        <!-- 仅暗色模式显示：开关 WebGL 星空（不支持时按钮禁用提示） -->
+        <button
+          v-if="theme === 'dark'"
+          class="theme-btn"
+          :class="{ active: preferWebGL && webglCapable }"
+          :disabled="!webglCapable"
+          :title="webglToggleTitle"
+          @click="togglePreferWebGL"
+        >
+          <IconSvg name="sparkles" :size="16" />
         </button>
         <div class="lang-dropdown">
           <button class="theme-btn lang-btn" :title="'Language'">
@@ -126,9 +170,11 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from '../composables/useI18n'
+import { useWebGLBackground } from '../composables/useWebGLBackground'
 import IconSvg from './IconSvg.vue'
 import SearchBox from './SearchBox.vue'
 
@@ -138,6 +184,13 @@ defineEmits(['openDrawer'])
 const route = useRoute()
 const { theme, toggleTheme } = useTheme()
 const { currentLang, t, setLang, langNames } = useI18n()
+const { preferWebGL, webglCapable, togglePreferWebGL } = useWebGLBackground()
+
+/** WebGL 开关按钮的提示文案 */
+const webglToggleTitle = computed(() => {
+  if (!webglCapable.value) return t('theme.webglUnavailable')
+  return preferWebGL.value ? t('theme.webglOff') : t('theme.webglOn')
+})
 
 function isActive(path) {
   if (path === '/') return route.path === '/'
@@ -351,12 +404,20 @@ function isActive(path) {
 .theme-btn {
   width: 32px;
   height: 32px;
+  border: none;
+  background: transparent;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+a.theme-btn.mail-btn:hover {
+  transform: scale(1.08);
 }
 
 .theme-btn:hover {
@@ -364,6 +425,17 @@ function isActive(path) {
   color: var(--color-text);
   transform: rotate(15deg) scale(1.1);
   box-shadow: 0 0 12px rgba(91, 141, 239, 0.2);
+}
+
+.theme-btn.active {
+  color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent-light));
+}
+
+.theme-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .auto-btn.active {
@@ -470,7 +542,10 @@ function isActive(path) {
 
 @media (max-width: 768px) {
   .nav-container {
+    margin-left: 0;
+    margin-right: 0;
     padding: 0 16px;
+    gap: 12px;
   }
 
   /* 显示汉堡菜单按钮 */

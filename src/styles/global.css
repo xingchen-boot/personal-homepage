@@ -144,3 +144,25 @@ code, pre, .mono {
   transform: translateX(10px);
   opacity: 0;
 }
+
+/* 打印简历：隐藏站点壳层与背景动画 */
+@media print {
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  .top-nav,
+  .mobile-drawer,
+  .offline-banner,
+  .reading-progress,
+  .back-to-top,
+  .cherry-blossom-bg,
+  .starry-bg {
+    display: none !important;
+  }
+
+  .main-content {
+    padding-top: 0 !important;
+  }
+}

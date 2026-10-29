@@ -41,6 +41,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { toDateKey } from '../utils/date'
 
 const hasMore = ref(true)
 
@@ -95,17 +96,23 @@ const diaries = ref([
   },
 ])
 
+function parts(dateStr) {
+  const key = toDateKey(dateStr)
+  const m = key.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  return m ? { y: m[1], mo: parseInt(m[2], 10), d: parseInt(m[3], 10) } : { y: '', mo: 1, d: 1 }
+}
+
 function getDay(dateStr) {
-  return parseInt(dateStr.split('-')[2])
+  return parts(dateStr).d
 }
 
 function getMonth(dateStr) {
   const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
-  return months[parseInt(dateStr.split('-')[1]) - 1]
+  return months[parts(dateStr).mo - 1]
 }
 
 function getYear(dateStr) {
-  return dateStr.split('-')[0]
+  return parts(dateStr).y
 }
 
 function loadMore() {

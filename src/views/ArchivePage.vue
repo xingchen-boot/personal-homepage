@@ -4,23 +4,30 @@
       <h1 class="page-title">{{ t('archive.title') }}</h1>
       <p class="page-subtitle">{{ blogList.length }} {{ t('archive.totalArticles') }}</p>
 
+      <div v-if="blogList.length === 0" class="empty-hint">
+        暂无文章。后端离线时会自动使用本地示例数据，也可先查看
+        <router-link to="/projects">项目</router-link>
+        或
+        <router-link to="/resume">简历</router-link>。
+      </div>
+
       <div
-        v-for="(blogs, year) in archives"
-        :key="year"
+        v-for="group in archives"
+        :key="group.year"
         class="archive-year"
       >
-        <h2 class="year-title">{{ year }}</h2>
+        <h2 class="year-title">{{ group.year }}</h2>
         <div class="archive-list">
-          <div
-            v-for="blog in blogs"
+          <router-link
+            v-for="blog in group.blogs"
             :key="blog.id"
+            :to="{ name: 'BlogDetail', params: { id: blog.id } }"
             class="archive-item"
-            @click="goToBlog(blog.id)"
           >
             <span class="item-date">{{ formatDate(blog.date) }}</span>
             <span class="item-title">{{ blog.title }}</span>
             <span class="item-category">{{ blog.category }}</span>
-          </div>
+          </router-link>
         </div>
       </div>
     </div>
@@ -29,13 +36,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { getBlogs } from '../api'
+import { formatDate, toDateKey } from '../utils/date'
 import { useI18n } from '../composables/useI18n'
 
 const { t } = useI18n()
 
-const router = useRouter()
 const blogList = ref([])
 
 onMounted(async () => {
@@ -44,22 +50,18 @@ onMounted(async () => {
 
 const archives = computed(() => {
   const map = {}
-  blogList.value.forEach(blog => {
-    const year = blog.date.slice(0, 4)
+  blogList.value.forEach((blog) => {
+    const year = toDateKey(blog.date).slice(0, 4) || String(blog.date).slice(0, 4)
+    if (!year) return
     if (!map[year]) map[year] = []
     map[year].push(blog)
   })
-  return map
+  // 用数组保证新年份在上（对象的整数键枚举序不稳定）
+  return Object.keys(map)
+    .sort((a, b) => Number(b) - Number(a))
+    .map((year) => ({ year, blogs: map[year] }))
 })
 
-function goToBlog(id) {
-  router.push({ name: 'BlogDetail', params: { id } })
-}
-
-function formatDate(dateStr) {
-  const [year, month, day] = dateStr.split('-')
-  return `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`
-}
 </script>
 
 <style scoped>
@@ -98,6 +100,20 @@ function formatDate(dateStr) {
   border-bottom: 1px solid var(--color-border);
 }
 
+.empty-hint {
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.empty-hint a {
+  color: var(--color-primary);
+}
+
 .archive-list {
   display: flex;
   flex-direction: column;
@@ -112,6 +128,13 @@ function formatDate(dateStr) {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.archive-item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .archive-item:hover {

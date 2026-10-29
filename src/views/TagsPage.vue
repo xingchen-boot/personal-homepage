@@ -20,15 +20,15 @@
 
       <!-- 文章列表 -->
       <div class="tag-articles">
-        <div
+        <router-link
           v-for="blog in filteredBlogs"
           :key="blog.id"
+          :to="{ name: 'BlogDetail', params: { id: blog.id } }"
           class="article-item"
-          @click="goToBlog(blog.id)"
         >
           <span class="article-date">{{ formatDate(blog.date) }}</span>
           <span class="article-title">{{ blog.title }}</span>
-        </div>
+        </router-link>
       </div>
     </div>
   </div>
@@ -36,13 +36,12 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { getBlogs, getTags } from '../api'
+import { formatDate } from '../utils/date'
 import { useI18n } from '../composables/useI18n'
 
 const { t } = useI18n()
 
-const router = useRouter()
 const selectedTag = ref('')
 const blogList = ref([])
 const tagList = ref([])
@@ -64,14 +63,6 @@ watch(selectedTag, async (tag) => {
 
 const filteredBlogs = computed(() => blogList.value)
 
-function goToBlog(id) {
-  router.push({ name: 'BlogDetail', params: { id } })
-}
-
-function formatDate(dateStr) {
-  const [year, month, day] = dateStr.split('-')
-  return `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`
-}
 </script>
 
 <style scoped>
@@ -148,6 +139,13 @@ function formatDate(dateStr) {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .article-item:hover {

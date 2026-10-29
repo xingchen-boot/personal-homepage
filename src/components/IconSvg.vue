@@ -189,6 +189,10 @@
     </template>
 
     <!-- ===== GitHub ===== -->
+    <template v-else-if="name === 'mail'">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="M22 7l-10 7L2 7" />
+    </template>
     <template v-else-if="name === 'github'">
       <path
         d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
@@ -288,6 +292,18 @@
     <template v-else-if="name === 'arrow-up'">
       <line x1="12" y1="19" x2="12" y2="5" stroke="url(#grad-light)" stroke-width="1.8" stroke-linecap="round" />
       <polyline points="5,12 12,5 19,12" stroke="url(#grad-light)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    </template>
+
+    <!-- ===== 星尘 / WebGL 背景开关 ===== -->
+    <template v-else-if="name === 'sparkles'">
+      <path
+        d="M12 3l1.2 4.2L17.5 8.5l-4.3 1.3L12 14l-1.2-4.2L6.5 8.5l4.3-1.3L12 3z"
+        fill="url(#grad-light)"
+        opacity="0.95"
+      />
+      <circle cx="18.5" cy="6" r="1.2" fill="var(--icon-accent)" opacity="0.85" />
+      <circle cx="5.5" cy="16.5" r="1" fill="var(--icon-accent)" opacity="0.7" />
+      <circle cx="18" cy="17" r="0.8" fill="url(#grad-light)" opacity="0.8" />
     </template>
   </svg>
 </template>

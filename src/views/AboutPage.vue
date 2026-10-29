@@ -5,17 +5,28 @@
       <section class="profile-card">
         <div class="profile-header">
           <div class="avatar-wrapper">
-            <img :src="avatar" alt="Avatar" class="avatar-img" />
+            <img :src="avatar" alt="星辰 / 林昭南" class="avatar-img" />
           </div>
           <div class="profile-info">
-            <h1 class="profile-name">星辰</h1>
-            <p class="profile-title">前端开发爱好者</p>
-            <p class="profile-motto">用代码创造美好体验</p>
+            <h1 class="profile-name">星辰 · 林昭南</h1>
+            <p class="profile-title">腾讯前端实习 · 2027 届 · 性能与 AI Agent</p>
+            <p class="profile-motto">把慢链路压快，把模型变成能动手的运行时</p>
           </div>
         </div>
         <div class="profile-bio">
-          <p>热爱前端开发，喜欢探索新技术，用代码实现创意想法。目前专注于 Vue 生态，也在持续学习 React 和 TypeScript。</p>
-          <p>这个博客是我的个人空间，用来记录学习笔记、技术总结和生活感悟。希望能帮到你 ~</p>
+          <p>
+            我是林昭南，广东工业大学计算机科学与技术在读（GPA 4.0 / 前 10%）。
+            目前在腾讯参与 PC QQ Electron → Qt 原生渲染的 CSS 下沉架构，做过三七互娱海外客服后台与电信检察政务系统前端。
+          </p>
+          <p>
+            关注 Vue 生态、性能优化、虚拟列表、流式 AI 交互，以及 AI Agent / MCP / RAG 等落地实践。
+            这里记录可复用的工程复盘与可验证的结果，方便交流与求职展示。
+          </p>
+        </div>
+        <div class="profile-actions">
+          <router-link to="/resume" class="action-btn primary">查看完整简历</router-link>
+          <router-link to="/projects" class="action-btn">项目作品集</router-link>
+          <a href="mailto:3141163409@qq.com" class="action-btn">邮件联系</a>
         </div>
       </section>
 
@@ -53,13 +64,13 @@
         </div>
       </section>
 
-      <!-- 兴趣爱好 -->
+      <!-- 近期关注 -->
       <section class="section">
-        <h2 class="section-title">兴趣爱好</h2>
+        <h2 class="section-title">近期关注</h2>
         <div class="hobbies-grid">
-          <div v-for="hobby in hobbies" :key="hobby.name" class="hobby-item">
-            <span class="hobby-icon">{{ hobby.icon }}</span>
-            <span class="hobby-name">{{ hobby.name }}</span>
+          <div v-for="item in focusItems" :key="item.name" class="hobby-item">
+            <span class="hobby-icon">{{ item.icon }}</span>
+            <span class="hobby-name">{{ item.name }}</span>
           </div>
         </div>
       </section>
@@ -67,16 +78,16 @@
       <!-- 联系方式 -->
       <section class="section">
         <h2 class="section-title">联系我</h2>
-        <p class="contact-text">如果你有任何问题或合作意向，欢迎通过以下方式联系我：</p>
+        <p class="contact-text">实习 / 技术交流 / 合作意向，欢迎通过以下方式联系：</p>
         <div class="contact-methods">
-          <div class="contact-item">
+          <a class="contact-item" href="mailto:3141163409@qq.com">
             <span class="contact-icon">📧</span>
-            <span class="contact-value">your-email@example.com</span>
-          </div>
-          <div class="contact-item">
-            <span class="contact-icon">💬</span>
-            <span class="contact-value">微信：your-wechat</span>
-          </div>
+            <span class="contact-value">3141163409@qq.com</span>
+          </a>
+          <a class="contact-item" href="https://github.com/xingchen-boot" target="_blank" rel="noopener noreferrer">
+            <span class="contact-icon">🐙</span>
+            <span class="contact-value">GitHub · xingchen-boot</span>
+          </a>
         </div>
       </section>
     </div>
@@ -84,45 +95,45 @@
 </template>
 
 <script setup>
+/**
+ * 关于页：博客人设「星辰」+ 真实履历摘要
+ * 完整经历见 /resume
+ */
 import avatar from '../assets/20230311003752_5b225.thumb.400_0.jpg'
 
 const socialLinks = [
-  { name: 'GitHub', icon: '🐙', url: 'https://github.com/xingchen-boot', desc: '开源项目和代码' },
-  { name: '掘金', icon: '📘', url: 'https://juejin.cn', desc: '技术文章分享' },
-  { name: '知乎', icon: '💡', url: 'https://zhihu.com', desc: '问答和思考' },
-  { name: 'B站', icon: '📺', url: 'https://bilibili.com', desc: '视频内容' },
+  { name: 'GitHub', icon: '🐙', url: 'https://github.com/xingchen-boot', desc: '开源项目与代码' },
+  { name: '问卷易', icon: '📋', url: 'https://wj.denglu1.cn/', desc: '校团队问卷调查系统' },
 ]
 
+/** 与简历「专业技能」对齐的精简版 */
 const skillCategories = [
   {
-    name: '前端基础',
-    skills: ['HTML5', 'CSS3', 'JavaScript', 'TypeScript'],
+    name: '前端框架',
+    skills: ['Vue 2 / Vue 3', 'TypeScript', 'Vue Router', 'Pinia / Vuex'],
   },
   {
-    name: '框架与库',
-    skills: ['Vue 3', 'React', 'Vue Router', 'Pinia', 'Vite'],
+    name: '工程与性能',
+    skills: ['Vite', 'Webpack', '虚拟列表', 'Web Worker', 'Profiling'],
   },
   {
-    name: 'UI 与样式',
-    skills: ['Element Plus', 'Tailwind CSS', 'SCSS', 'UnoCSS'],
+    name: 'AI 与 Agent',
+    skills: ['OpenAI SDK', 'MCP', 'Function Calling', 'RAG'],
   },
   {
-    name: '工具与平台',
-    skills: ['Git', 'GitHub', 'VS Code', 'Figma', 'Chrome DevTools'],
-  },
-  {
-    name: '后端与数据库',
-    skills: ['Node.js', 'Express', 'MySQL', 'MongoDB'],
+    name: '跨端与基础',
+    skills: ['Electron', 'Qt 渲染链路', 'Node.js', 'HTTP / 浏览器原理'],
   },
 ]
 
-const hobbies = [
-  { name: '编程', icon: '💻' },
-  { name: '阅读', icon: '📚' },
-  { name: '音乐', icon: '🎵' },
-  { name: '游戏', icon: '🎮' },
-  { name: '摄影', icon: '📷' },
-  { name: '旅行', icon: '✈️' },
+/** 兴趣改为「近期关注」，更贴合求职向人设 */
+const focusItems = [
+  { name: 'CSS Runtime', icon: '🧩' },
+  { name: '性能优化', icon: '⚡' },
+  { name: 'AI Agent', icon: '🤖' },
+  { name: '流式交互', icon: '🌊' },
+  { name: '工程化', icon: '🛠️' },
+  { name: '博客写作', icon: '✍️' },
 ]
 </script>
 
@@ -136,7 +147,6 @@ const hobbies = [
   margin: 0 auto;
 }
 
-/* 个人介绍卡片 */
 .profile-card {
   background: var(--color-bg-card);
   border-radius: 16px;
@@ -198,7 +208,42 @@ const hobbies = [
   margin-bottom: 0;
 }
 
-/* 通用区块 */
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.action-btn.primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.action-btn.primary:hover {
+  opacity: 0.9;
+  color: #fff;
+}
+
 .section {
   margin-bottom: 32px;
 }
@@ -212,7 +257,6 @@ const hobbies = [
   border-bottom: 1px solid var(--color-border);
 }
 
-/* 社交链接 */
 .social-links {
   display: flex;
   flex-direction: column;
@@ -257,7 +301,6 @@ const hobbies = [
   color: var(--color-text-secondary);
 }
 
-/* 技能栈 */
 .skills-grid {
   display: flex;
   flex-direction: column;
@@ -300,7 +343,6 @@ const hobbies = [
   color: #fff;
 }
 
-/* 兴趣爱好 */
 .hobbies-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -332,7 +374,6 @@ const hobbies = [
   color: var(--color-text);
 }
 
-/* 联系方式 */
 .contact-text {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
@@ -353,6 +394,12 @@ const hobbies = [
   background: var(--color-bg-card);
   border-radius: 12px;
   border: 1px solid var(--color-border);
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+.contact-item:hover {
+  border-color: var(--color-primary);
 }
 
 .contact-icon {
@@ -368,6 +415,10 @@ const hobbies = [
   .profile-header {
     flex-direction: column;
     text-align: center;
+  }
+
+  .profile-actions {
+    justify-content: center;
   }
 
   .hobbies-grid {
