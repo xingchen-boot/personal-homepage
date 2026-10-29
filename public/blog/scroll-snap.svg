@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="220" viewBox="0 0 900 220" role="img" aria-label="横向滚动与 scroll-snap">
+  <rect width="900" height="220" rx="16" fill="#0f1629"/>
+  <text x="28" y="38" fill="#c9dcff" font-family="Segoe UI, sans-serif" font-size="17" font-weight="700">overflow-x + flex + scroll-snap</text>
+  <rect x="28" y="70" width="844" height="110" rx="12" fill="#172038" stroke="#3a5f9e"/>
+  <g font-family="Segoe UI, sans-serif">
+    <rect x="48" y="90" width="180" height="70" rx="10" fill="#5b8def"/>
+    <text x="138" y="130" text-anchor="middle" fill="#fff" font-size="13">Card 1</text>
+    <rect x="248" y="90" width="180" height="70" rx="10" fill="#7aa8f5"/>
+    <text x="338" y="130" text-anchor="middle" fill="#fff" font-size="13">Card 2 · snap</text>
+    <rect x="448" y="90" width="180" height="70" rx="10" fill="#5b8def" opacity="0.55"/>
+    <text x="538" y="130" text-anchor="middle" fill="#fff" font-size="13">Card 3</text>
+    <rect x="648" y="90" width="180" height="70" rx="10" fill="#5b8def" opacity="0.35"/>
+    <text x="738" y="130" text-anchor="middle" fill="#fff" font-size="13">Card 4</text>
+  </g>
+  <text x="28" y="205" fill="#9db4d8" font-family="Segoe UI, sans-serif" font-size="12">flex-shrink:0 固定卡片宽 · scroll-snap-type:x mandatory · 移动端加 -webkit-overflow-scrolling:touch</text>
+</svg>
