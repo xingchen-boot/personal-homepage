@@ -10,6 +10,8 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   charset: 'utf8mb4',
+  // DATE 以 YYYY-MM-DD 字符串返回，避免经 Date→ISO 时区导致差一天
+  dateStrings: true,
 })
 
 module.exports = pool
